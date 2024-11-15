@@ -1,7 +1,7 @@
 package com.module5.zingMp3Clone.API;
 
 import com.module5.zingMp3Clone.Model.Request.UserChangePassword;
-import com.module5.zingMp3Clone.Model.Request.UserLoginRequest;
+import com.module5.zingMp3Clone.Model.Request.AuthenticationRequest;
 import com.module5.zingMp3Clone.Model.Request.UserRequest;
 import com.module5.zingMp3Clone.Model.Request.UserUpdateRequest;
 import com.module5.zingMp3Clone.Model.Response.APIResponse;
@@ -72,17 +72,6 @@ public class UserAPI {
         APIResponse response = APIResponse.builder()
                 .message("SUCCESS")
                 .data(list)
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @PostMapping(value = "/login")
-    @PermitAll
-    public ResponseEntity<APIResponse> login(@Valid @RequestBody UserLoginRequest userLoginRequest, BindingResult result) {
-        String token = userService.login(userLoginRequest);
-        APIResponse response = APIResponse.builder()
-                .message("LOGIN SUCCESS")
-                .data(token)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
