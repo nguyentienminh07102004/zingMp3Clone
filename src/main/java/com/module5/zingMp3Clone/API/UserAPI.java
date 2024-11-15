@@ -77,7 +77,6 @@ public class UserAPI {
     }
 
     @PostMapping(value = "/login")
-    @PermitAll
     public ResponseEntity<APIResponse> login(@Valid @RequestBody UserLoginRequest userLoginRequest, BindingResult result) {
         String token = userService.login(userLoginRequest);
         APIResponse response = APIResponse.builder()
