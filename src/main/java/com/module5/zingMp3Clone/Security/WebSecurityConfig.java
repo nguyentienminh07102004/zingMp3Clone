@@ -23,9 +23,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(jsr250Enabled = true)
+//@EnableMethodSecurity(jsr250Enabled = true)
 public class WebSecurityConfig {
-    private final String[] PUBLIC_URLS = {"/", "/api/auth/login", "/logout"};
+    private final String[] PUBLIC_URLS = {"/", "/api/**", "/logout", "/login"};
     @Value(value = "${jwt.SINGER_KEY}")
     private String singerKey;
     @Value(value = "${api.prefix}")
@@ -44,15 +44,16 @@ public class WebSecurityConfig {
                         .deleteCookies("authToken")
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwtConfigurer -> {jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        .jwt(jwtConfigurer -> {jwtConfigurer
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
                                 .decoder(jwtDecoder());
                         })
                         .bearerTokenResolver(new CookieBearerTokenResolver())
 
-                )
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response, authException) -> response.sendRedirect("/login"))
                 );
+//                .exceptionHandling(exception -> exception
+//                        .authenticationEntryPoint((request, response, authException) -> response.sendRedirect("/login"))
+//                );
         http.csrf(AbstractHttpConfigurer::disable);
         //http.cors(corsConfigurer -> corsFilter());
         return http.build();
