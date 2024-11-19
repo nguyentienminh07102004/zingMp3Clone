@@ -5,14 +5,12 @@ import com.module5.zingMp3Clone.Exception.ExceptionValue;
 import com.module5.zingMp3Clone.Model.Entity.RoleEntity;
 import com.module5.zingMp3Clone.Model.Entity.UserEntity;
 import com.module5.zingMp3Clone.Model.Request.UserChangePassword;
-import com.module5.zingMp3Clone.Model.Request.UserLoginRequest;
 import com.module5.zingMp3Clone.Model.Request.UserRequest;
 import com.module5.zingMp3Clone.Model.Request.UserUpdateRequest;
 import com.module5.zingMp3Clone.Model.Response.UserResponse;
 import com.module5.zingMp3Clone.Repository.IRoleRepository;
 import com.module5.zingMp3Clone.Repository.IUserRepository;
 import com.module5.zingMp3Clone.Security.GeneratorToken;
-import com.nimbusds.jose.JOSEException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -96,20 +94,6 @@ public class UserServiceImpl implements IUserService {
         return new PagedModel<>(pageResponse);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public String login(UserLoginRequest userLoginRequest) {
-        UserEntity user = userRepository.findByEmail(userLoginRequest.getEmail())
-                .orElseThrow(() -> new DataInvalidException("Email or password invalid!"));
-        if (!passwordEncoder.matches(userLoginRequest.getPassword(), user.getPassword())) {
-            throw new DataInvalidException("Email or password invalid!");
-        }
-        try {
-            return generatorToken.generatorToken(user);
-        } catch (JOSEException e) {
-            throw new DataInvalidException(e.getMessage());
-        }
-    }
 
     @Override
     @Transactional

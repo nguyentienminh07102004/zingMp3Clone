@@ -1,5 +1,6 @@
 package com.module5.zingMp3Clone.Security;
 
+import com.module5.zingMp3Clone.Exception.ExceptionValue;
 import com.module5.zingMp3Clone.Model.Entity.RoleEntity;
 import com.module5.zingMp3Clone.Model.Entity.UserEntity;
 import com.nimbusds.jose.JOSEException;
@@ -23,7 +24,7 @@ public class GeneratorToken {
     @Value(value = "${jwt.SINGER_KEY}")
     private String SINGER_KEY;
 
-    public String generatorToken(UserEntity user) throws JOSEException {
+    public String generatorToken(UserEntity user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .jwtID(UUID.randomUUID().toString())
@@ -32,7 +33,11 @@ public class GeneratorToken {
                 .claim("scope", buildScope(user.getRoles()))
                 .build();
         JWSObject jwsObject = new JWSObject(header, new Payload(claimsSet.toJSONObject()));
-        jwsObject.sign(new MACSigner(SINGER_KEY.getBytes()));
+        try {
+            jwsObject.sign(new MACSigner(SINGER_KEY.getBytes()));
+        } catch (JOSEException e) {
+            throw new RuntimeException(ExceptionValue.FAILED_GENERATOR_TOKEN.getValue());
+        }
         return jwsObject.serialize();
     }
 
