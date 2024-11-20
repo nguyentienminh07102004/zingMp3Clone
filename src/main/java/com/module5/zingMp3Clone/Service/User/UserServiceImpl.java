@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,15 +53,11 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public UserResponse updateUser(UserUpdateRequest userUpdateRequest) {
-        if(userUpdateRequest.getId() == null || userUpdateRequest.getEmail() == null) {
-            throw new DataInvalidException("Data invalid!");
-        }
-        UserEntity user = userRepository.findById(userUpdateRequest.getId())
-                .orElseThrow(() -> new DataInvalidException("User not found!"));
-        if(!user.getEmail().equals(userUpdateRequest.getEmail())) {
-            throw new DataInvalidException("Email invalid!");
-        }
-        UserEntity userEntity = modelMapper.map(userUpdateRequest, UserEntity.class);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new DataInvalidException("Email not exist!"));
+        user.setUsername(userUpdateRequest.getUsername());
+        user.setPhone(userUpdateRequest.getPhone());
         if(!userUpdateRequest.getRoles().isEmpty()) {
             List<RoleEntity> list = new ArrayList<>();
             userUpdateRequest.getRoles().forEach(role -> {
@@ -68,9 +65,9 @@ public class UserServiceImpl implements IUserService {
                         .orElseThrow(() -> new DataInvalidException("Role not found!"));
                 list.add(roleEntity);
             });
-            userEntity.setRoles(list);
+            user.setRoles(list);
         }
-        UserEntity userEntityUpdated = userRepository.save(userEntity);
+        UserEntity userEntityUpdated = userRepository.save(user);
         return modelMapper.map(userEntityUpdated, UserResponse.class);
     }
 
@@ -98,7 +95,8 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public UserResponse changePassword(UserChangePassword userChangePassword) {
-        UserEntity user = userRepository.findById(userChangePassword.getId())
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new DataInvalidException("User not found!"));
         if(passwordEncoder.matches(userChangePassword.getOldPassword(), user.getPassword())) {
             throw new DataInvalidException("Old password is invalid!");

@@ -15,8 +15,6 @@ import lombok.Setter;
 @Builder
 public class UserChangePassword {
     @NotBlank
-    private String id;
-    @NotBlank
     @Size(min = 6, max = 32)
     private String oldPassword;
     @NotBlank

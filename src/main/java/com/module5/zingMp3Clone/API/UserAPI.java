@@ -1,13 +1,10 @@
 package com.module5.zingMp3Clone.API;
 
 import com.module5.zingMp3Clone.Model.Request.UserChangePassword;
-import com.module5.zingMp3Clone.Model.Request.AuthenticationRequest;
-import com.module5.zingMp3Clone.Model.Request.UserRequest;
 import com.module5.zingMp3Clone.Model.Request.UserUpdateRequest;
 import com.module5.zingMp3Clone.Model.Response.APIResponse;
 import com.module5.zingMp3Clone.Model.Response.UserResponse;
 import com.module5.zingMp3Clone.Service.User.IUserService;
-import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PagedModel;
@@ -34,16 +31,6 @@ import java.util.List;
 public class UserAPI {
     private final IUserService userService;
 
-    @PostMapping(value = "/register")
-    private ResponseEntity<APIResponse> saveUser(@Valid @RequestBody UserRequest userRequest, BindingResult result) {
-        UserResponse userResponse = userService.save(userRequest);
-        APIResponse response = APIResponse.builder()
-                .message("SUCCESS")
-                .data(userResponse)
-                .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
     @PutMapping(value = "/update-profile")
     @PostAuthorize(value = "returnObject.body.data.email.equals(authentication.name) || hasRole('ADMIN')")
     public ResponseEntity<APIResponse> updateUser(@Valid @RequestBody UserUpdateRequest userRequest, BindingResult result) {
@@ -66,7 +53,7 @@ public class UserAPI {
     }
 
     @GetMapping(value = "/")
-    @PermitAll
+    @PreAuthorize(value = "hasRole('ADMIN')")
     public ResponseEntity<APIResponse> getAllUsers(@RequestParam(required = false) Integer page) {
         PagedModel<UserResponse> list = userService.getAllUsers(page);
         APIResponse response = APIResponse.builder()
