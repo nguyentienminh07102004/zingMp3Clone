@@ -1,0 +1,23 @@
+package com.module5.zingMp3Clone.Model.Entity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+
+import java.util.List;
+
+@Entity
+public class SongEntity extends BaseEntity {
+    @Id
+    private String id;
+    private String name;
+    private String description;
+    private Long numsOfListen;
+    private Long numsOfLike;
+
+    @ManyToMany
+    private List<SingerEntity> singers;
+
+    @ManyToMany
+    private List<PlaylistEntity> playlists;
+}
