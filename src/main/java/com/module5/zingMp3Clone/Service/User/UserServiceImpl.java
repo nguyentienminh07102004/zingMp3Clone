@@ -37,12 +37,12 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public UserResponse save(UserRequest userRequest) {
-        if(!userRequest.getPassword().equals(userRequest.getRePassword())) {
+        if (!userRequest.getPassword().equals(userRequest.getRePassword())) {
             throw new DataInvalidException(ExceptionValue.PASSWORD_INVALID.getValue());
         }
         UserEntity user = modelMapper.map(userRequest, UserEntity.class);
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
-        if(userRequest.getRoles() == null || userRequest.getRoles().isEmpty()) {
+        if (userRequest.getRoles() == null || userRequest.getRoles().isEmpty()) {
             user.setRoles(List.of(roleRepository.findById("USER")
                     .orElseGet(() -> roleRepository.save(new RoleEntity("USER", "Người dùng")))));
         }
@@ -58,7 +58,7 @@ public class UserServiceImpl implements IUserService {
                 .orElseThrow(() -> new DataInvalidException("Email not exist!"));
         user.setUsername(userUpdateRequest.getUsername());
         user.setPhone(userUpdateRequest.getPhone());
-        if(!userUpdateRequest.getRoles().isEmpty()) {
+        if (userUpdateRequest.getRoles() != null && !userUpdateRequest.getRoles().isEmpty()) {
             List<RoleEntity> list = new ArrayList<>();
             userUpdateRequest.getRoles().forEach(role -> {
                 RoleEntity roleEntity = roleRepository.findById(role)
@@ -98,10 +98,10 @@ public class UserServiceImpl implements IUserService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new DataInvalidException("User not found!"));
-        if(passwordEncoder.matches(userChangePassword.getOldPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(userChangePassword.getOldPassword(), user.getPassword())) {
             throw new DataInvalidException("Old password is invalid!");
         }
-        if(!userChangePassword.getNewPassword().equals(userChangePassword.getReNewPassword())) {
+        if (!userChangePassword.getNewPassword().equals(userChangePassword.getReNewPassword())) {
             throw new DataInvalidException("New password and repeat new password is invalid!");
         }
         user.setPassword(passwordEncoder.encode(userChangePassword.getNewPassword()));

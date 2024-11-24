@@ -25,7 +25,7 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableWebSecurity
 @EnableMethodSecurity(jsr250Enabled = true)
 public class WebSecurityConfig {
-    private final String[] PUBLIC_URLS = {"/", "/api/**", "/logout", "/login"};
+    private final String[] PUBLIC_URLS = {"/", "/api/**", "/logout", "/login", "/video/**"};
     @Value(value = "${jwt.SINGER_KEY}")
     private String singerKey;
     @Value(value = "${api.prefix}")

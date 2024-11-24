@@ -1,7 +1,6 @@
 package com.module5.zingMp3Clone.Service.User;
 
 import com.module5.zingMp3Clone.Model.Request.UserChangePassword;
-import com.module5.zingMp3Clone.Model.Request.AuthenticationRequest;
 import com.module5.zingMp3Clone.Model.Request.UserRequest;
 import com.module5.zingMp3Clone.Model.Request.UserUpdateRequest;
 import com.module5.zingMp3Clone.Model.Response.UserResponse;
