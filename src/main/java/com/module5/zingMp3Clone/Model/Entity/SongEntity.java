@@ -25,6 +25,8 @@ public class SongEntity extends BaseEntity {
     private String id;
     @Column(name = "name")
     private String name;
+    @Column(name = "avatar")
+    private String avatar;
     @Column(name = "description", columnDefinition = "LONGTEXT")
     private String description;
     @Column(name = "url")

@@ -59,12 +59,13 @@ public class SongServiceImpl implements ISongService {
     @Override
     @Transactional
     public SongResponse saveSong(SongRequest song) {
-        if (song.getId() != null) {
-            this.getSongById(song.getId());
-        }
         SongEntity songEntity = toEntity(song);
-        SongEntity result = songRepository.save(songEntity);
-        return toResponse(result);
+        if (songEntity.getId() == null) {
+            songEntity.setNumsOfLike(0L);
+            songEntity.setNumsOfListen(0L);
+        }
+        songEntity = songRepository.save(songEntity);
+        return toResponse(songEntity);
     }
 
     @Override

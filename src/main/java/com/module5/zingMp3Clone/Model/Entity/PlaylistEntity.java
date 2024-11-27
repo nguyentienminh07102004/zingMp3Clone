@@ -23,8 +23,14 @@ public class PlaylistEntity extends BaseEntity {
     private String id;
     @Column(name = "name")
     private String name;
+    @Column(name = "slug")
+    private String slug;
     @Column(name = "avatar")
     private String avatar;
+    @Column(name = "view_counts")
+    private Long viewCounts;
+    @Column(name = "like_counts")
+    private Long likeCounts;
 
     @ManyToMany(mappedBy = "playlists")
     private List<SongEntity> songs;
