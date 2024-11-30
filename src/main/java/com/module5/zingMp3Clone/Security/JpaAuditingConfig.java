@@ -1,7 +1,6 @@
 package com.module5.zingMp3Clone.Security;
 
 import lombok.NonNull;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
