@@ -7,6 +7,8 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.ServiceAccountCredentials;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.google.api.services.drive.model.File;
@@ -18,7 +20,8 @@ import java.util.Collections;
 
 @Service
 public class GoogleDriveService {
-    private final String FOLDER_ID = "13e7iNQVQZC7WPfQNlDPieuiHpsH0hsvA";
+    @Value("${google.drive.folder.id}")
+    private String FOLDER_ID;
 
     public String uploadFile(MultipartFile multipartFile) throws GeneralSecurityException, IOException {
         String mimeType = multipartFile.getContentType();
@@ -54,11 +57,9 @@ public class GoogleDriveService {
     }
 
     private Drive getDriveService() throws IOException, GeneralSecurityException {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("static/googleAuth.json");
         // Load service account key
-        assert inputStream != null;
         ServiceAccountCredentials credentials = (ServiceAccountCredentials) ServiceAccountCredentials
-                .fromStream(inputStream)
+                .fromStream(new ClassPathResource("GoogleDrive/auth.json").getInputStream())
                 .createScoped(Collections.singleton(DriveScopes.DRIVE));
 
         // Build the Drive service
