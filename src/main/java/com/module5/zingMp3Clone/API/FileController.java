@@ -2,13 +2,15 @@ package com.module5.zingMp3Clone.API;
 
 import com.module5.zingMp3Clone.Model.Response.APIResponse;
 import com.module5.zingMp3Clone.Service.GoogleDrive.GoogleDriveService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 @RestController
 @RequestMapping("/api/file")
@@ -18,15 +20,24 @@ public class FileController {
 
     @PostMapping("/upload")
     public ResponseEntity<APIResponse> upload(@RequestParam("file") MultipartFile file) {
-        String fileID;
+        String result;
         try {
-            fileID = googleDriveService.uploadFile(file);
+            result = googleDriveService.uploadFile(file);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return ResponseEntity.ok(APIResponse.builder()
                 .message("SUCCESS")
-                .data(fileID)
+                .data(result)
                 .build());
+    }
+    @GetMapping("/stream-audio/{fileId}")
+    public void streamAudio(@PathVariable String fileId, HttpServletResponse response, HttpServletRequest request) {
+        try {
+            googleDriveService.streamFileToResponse(fileId, response, request);
+        } catch (IOException | GeneralSecurityException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            e.printStackTrace();
+        }
     }
 }
