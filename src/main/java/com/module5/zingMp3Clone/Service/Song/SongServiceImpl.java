@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,11 @@ public class SongServiceImpl implements ISongService {
             responseList.add(songResponse);
         }
         return responseList;
+    }
+
+    @Override
+    public List<SongResponse> findByNameAndSingerId(String name, String singerId) {
+        return List.of();
     }
 
     @Override
@@ -76,6 +82,28 @@ public class SongServiceImpl implements ISongService {
                     .orElseThrow(() -> new DataInvalidException("Song not found!"));
             songRepository.deleteById(id);
         }
+    }
+
+    @Override
+    public List<SongResponse> getMySong() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        if(email == null || email.isBlank()) {
+            throw new DataInvalidException("You must login first!");
+        }
+        List<SongEntity> songs = songRepository.findAllByCreatedBy(email);
+        return songs.stream().map(this::toResponse).toList();
+    }
+
+    @Override
+    public List<SongResponse> findByNameContaining(String name) {
+        List<SongEntity> list = songRepository.findAllByNameContaining(name);
+        return list.stream().map(this::toResponse).toList();
+    }
+
+    @Override
+    public List<SongResponse> findBySingerId(String singerId) {
+        List<SongEntity> list = songRepository.findAllBySingers_Id(singerId);
+        return list.stream().map(this::toResponse).toList();
     }
 
     private SongResponse toResponse(SongEntity entity) {

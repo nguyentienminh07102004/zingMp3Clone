@@ -23,7 +23,7 @@ public class SingerEntity extends BaseEntity {
     private String id;
     @Column(name = "name")
     private String name;
-    @Column(name = "avatar")
+    @Column(name = "avatar", columnDefinition = "LONGTEXT")
     private String avatar;
 
     @ManyToMany(mappedBy = "singers")

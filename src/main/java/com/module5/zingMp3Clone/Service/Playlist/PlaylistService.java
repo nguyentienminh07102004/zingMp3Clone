@@ -26,11 +26,14 @@ public class PlaylistService {
     public List<PlaylistResponse> getAllPlaylistsOfCurrentUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         List<PlaylistEntity> playlistEntities = playlistRepository.findByCreatedBy(username);
-        if (playlistEntities.isEmpty()) {return null;}
+        if (playlistEntities.isEmpty()) {
+            return null;
+        }
         return playlistEntities.stream()
                 .map(playlistEntity -> modelMapper.map(playlistEntity, PlaylistResponse.class))
                 .toList();
     }
+
     public PagedModel<PlaylistResponse> getAllPlaylists(Integer page) {
         Pageable pageable = PageRequest.of(page, 8);
         Page<PlaylistEntity> playlists = playlistRepository.findAll(pageable);

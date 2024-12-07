@@ -25,7 +25,7 @@ public class PlaylistEntity extends BaseEntity {
     private String name;
     @Column(name = "slug")
     private String slug;
-    @Column(name = "avatar")
+    @Column(name = "avatar", columnDefinition = "LONGTEXT")
     private String avatar;
     @Column(name = "view_counts")
     private Long viewCounts;

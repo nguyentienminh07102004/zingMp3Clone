@@ -9,11 +9,15 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.ServiceAccountCredentials;
+import com.module5.zingMp3Clone.Model.Entity.SongEntity;
+import com.module5.zingMp3Clone.Repository.ISongRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import com.google.api.services.drive.model.File;
 
@@ -24,9 +28,11 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 
 @Service
+@RequiredArgsConstructor
 public class GoogleDriveService {
     @Value("${DRIVE_FOLDER}")
     private String FOLDER_ID;
+    private final ISongRepository songRepository;
 
     public String uploadFile(MultipartFile multipartFile) throws GeneralSecurityException, IOException {
         String mimeType = multipartFile.getContentType();
@@ -81,11 +87,11 @@ public class GoogleDriveService {
         return tempFile;
     }
 
-    public void streamFileToResponse(String fileId, HttpServletResponse response, HttpServletRequest request) throws IOException, GeneralSecurityException {
+    public void streamFileToResponse(String fileId, HttpServletResponse response, HttpServletRequest request)
+            throws IOException, GeneralSecurityException {
         Drive driveService = getDriveService();
         // Tạo URL để tải file
         String fileDownloadUrl = String.format("https://www.googleapis.com/drive/v3/files/%s?alt=media", fileId);
-
         // Gửi yêu cầu tải file
         HttpResponse googleResponse = driveService.getRequestFactory()
                 .buildGetRequest(new GenericUrl(fileDownloadUrl))
@@ -135,8 +141,14 @@ public class GoogleDriveService {
                 out.write(buffer, 0, len);
                 bytesRead += len;
             }
-
+            incrementNumOfListen(fileId);
             out.flush();
         }
+    }
+
+    private void incrementNumOfListen(String fileId) {
+        SongEntity song = songRepository.findByUrl(fileId);
+        song.setNumsOfListen(song.getNumsOfListen() + 1);
+        songRepository.save(song);
     }
 }

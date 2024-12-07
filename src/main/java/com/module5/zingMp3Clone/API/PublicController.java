@@ -9,7 +9,11 @@ import com.module5.zingMp3Clone.Service.Song.ISongService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -56,4 +60,28 @@ public class PublicController {
                 .build());
     }
 
+    @GetMapping(value = "/songs/all")
+    public ResponseEntity<APIResponse> getAllSongs() {
+        List<SongResponse> list = songService.getAllSongs();
+        APIResponse response = APIResponse.builder()
+                .message("SUCCESS")
+                .data(list)
+                .build();
+        return ResponseEntity.status(200).body(response);
+    }
+
+    @GetMapping(value = "/songs/uploaded")
+    public ResponseEntity<APIResponse> getMySongs() {
+        List<SongResponse> responses = songService.getMySong();
+        APIResponse apiResponse = APIResponse.builder()
+                .message("SUCCESS")
+                .data(responses)
+                .build();
+        return ResponseEntity.status(200).body(apiResponse);
+    }
+
+    public ResponseEntity<APIResponse> findSongBySingerAndName(@RequestParam(required = false) String name,
+                                                               @RequestParam(required = false) String singerId) {
+        List<SongResponse> responses = songService.get
+    }
 }
