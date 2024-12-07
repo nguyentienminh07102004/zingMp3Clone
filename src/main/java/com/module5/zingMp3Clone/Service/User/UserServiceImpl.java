@@ -10,7 +10,6 @@ import com.module5.zingMp3Clone.Model.Request.UserUpdateRequest;
 import com.module5.zingMp3Clone.Model.Response.UserResponse;
 import com.module5.zingMp3Clone.Repository.IRoleRepository;
 import com.module5.zingMp3Clone.Repository.IUserRepository;
-import com.module5.zingMp3Clone.Security.GeneratorToken;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -32,7 +31,6 @@ public class UserServiceImpl implements IUserService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final IRoleRepository roleRepository;
-    private final GeneratorToken generatorToken;
 
     @Override
     @Transactional

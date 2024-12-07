@@ -42,9 +42,6 @@ public class SongEntity extends BaseEntity {
     inverseJoinColumns = @JoinColumn(name = "singer_id"))
     private List<SingerEntity> singers;
 
-    @ManyToMany
-    @JoinTable(name = "song_playlist",
-    joinColumns = @JoinColumn(name = "song_id"),
-    inverseJoinColumns = @JoinColumn(name = "playlist_id"))
+    @ManyToMany(mappedBy = "songs")
     private List<PlaylistEntity> playlists;
 }

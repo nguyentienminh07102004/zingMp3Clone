@@ -12,4 +12,5 @@ public interface IPlaylistRepository extends JpaRepository<PlaylistEntity, Strin
     List<PlaylistEntity> findByCreatedBy(String username);
     Optional<PlaylistEntity> findBySlug(String slug);
     int countByName(String name);
+    PlaylistEntity findByPlaylistDefaultAndCreatedBy(boolean playlistDefault, String username);
 }

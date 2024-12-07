@@ -8,6 +8,7 @@ import com.module5.zingMp3Clone.Service.Playlist.PlaylistService;
 import com.module5.zingMp3Clone.Service.Song.ISongService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PagedModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -80,8 +81,23 @@ public class PublicController {
         return ResponseEntity.status(200).body(apiResponse);
     }
 
-    public ResponseEntity<APIResponse> findSongBySingerAndName(@RequestParam(required = false) String name,
-                                                               @RequestParam(required = false) String singerId) {
-        List<SongResponse> responses = songService.get
+    @GetMapping(value = "/search/singerId/")
+    public ResponseEntity<APIResponse> findSongBySinger(@RequestParam(required = false) String singerId) {
+        List<SongResponse> responses = songService.findBySingerId(singerId);
+        APIResponse response = APIResponse.builder()
+                .message("SUCCESS")
+                .data(responses)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping(value = "/search/name/")
+    public ResponseEntity<APIResponse> findSongByName(@RequestParam(required = false) String name) {
+        List<SongResponse> responses = songService.findByNameContaining(name);
+        APIResponse response = APIResponse.builder()
+                .message("SUCCESS")
+                .data(responses)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

@@ -7,9 +7,9 @@ import com.google.api.client.http.HttpResponse;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.File;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.ServiceAccountCredentials;
-import com.module5.zingMp3Clone.Model.Entity.SongEntity;
 import com.module5.zingMp3Clone.Repository.ISongRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,9 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import com.google.api.services.drive.model.File;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -141,14 +139,14 @@ public class GoogleDriveService {
                 out.write(buffer, 0, len);
                 bytesRead += len;
             }
-            incrementNumOfListen(fileId);
+            //incrementNumOfListen(fileId);
             out.flush();
         }
     }
 
-    private void incrementNumOfListen(String fileId) {
-        SongEntity song = songRepository.findByUrl(fileId);
-        song.setNumsOfListen(song.getNumsOfListen() + 1);
-        songRepository.save(song);
-    }
+//    private void incrementNumOfListen(String fileId) {
+//        SongEntity song = songRepository.findByUrl(fileId);
+//        song.setNumsOfListen(song.getNumsOfListen() + 1);
+//        songRepository.save(song);
+//    }
 }

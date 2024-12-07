@@ -15,6 +15,6 @@ public class JpaAuditingConfig implements AuditorAware<String> {
     @NonNull
     public Optional<String> getCurrentAuditor() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return Optional.of(username);
+        return username.equals("anonymousUser") ? Optional.empty() : Optional.of(username);
     }
 }

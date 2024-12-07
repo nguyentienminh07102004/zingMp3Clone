@@ -1,6 +1,7 @@
 package com.module5.zingMp3Clone.Service.Song;
 
 import com.module5.zingMp3Clone.Exception.DataInvalidException;
+import com.module5.zingMp3Clone.Model.Entity.PlaylistEntity;
 import com.module5.zingMp3Clone.Model.Entity.SingerEntity;
 import com.module5.zingMp3Clone.Model.Entity.SongEntity;
 import com.module5.zingMp3Clone.Model.Request.SongRequest;
@@ -8,6 +9,7 @@ import com.module5.zingMp3Clone.Model.Response.SingerResponse;
 import com.module5.zingMp3Clone.Model.Response.SongResponse;
 import com.module5.zingMp3Clone.Repository.ISingerRepository;
 import com.module5.zingMp3Clone.Repository.ISongRepository;
+import com.module5.zingMp3Clone.Service.Playlist.PlaylistService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -30,6 +32,7 @@ public class SongServiceImpl implements ISongService {
     ISongRepository songRepository;
     ModelMapper modelMapper;
     ISingerRepository singerRepository;
+    PlaylistService playlistService;
 
     @Override
     public List<SongResponse> getAllSongs() {
@@ -40,11 +43,6 @@ public class SongServiceImpl implements ISongService {
             responseList.add(songResponse);
         }
         return responseList;
-    }
-
-    @Override
-    public List<SongResponse> findByNameAndSingerId(String name, String singerId) {
-        return List.of();
     }
 
     @Override
@@ -112,6 +110,12 @@ public class SongServiceImpl implements ISongService {
                 .map(singer -> modelMapper.map(singer, SingerResponse.class))
                 .toList();
         songResponse.setSingers(singerResponses);
+        if (!SecurityContextHolder.getContext().getAuthentication().getName().equals("anonymousUser")) {
+            PlaylistEntity playlist = playlistService.getPlaylistById("default");
+            if(playlist.getSongs() != null && !playlist.getSongs().isEmpty()) {
+                songResponse.setLiked(playlist.getSongs().contains(entity));
+            }
+        }
         return songResponse;
     }
 
@@ -126,5 +130,23 @@ public class SongServiceImpl implements ISongService {
         }
         entity.setSingers(list);
         return entity;
+    }
+
+    @Transactional
+    @Override
+    public void increaseListenCount(String url) {
+        songRepository.increaseListenCount(url);
+    }
+
+    @Transactional
+    @Override
+    public void increaseLikeCount(String id) {
+        songRepository.increaseLikeCount(id);
+    }
+
+    @Transactional
+    @Override
+    public void decreaseLikeCount(String id) {
+        songRepository.decreaseLikeCount(id);
     }
 }

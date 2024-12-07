@@ -20,10 +20,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/secure")
@@ -81,5 +81,51 @@ public class SecureController {
                 .message("SUCCESS")
                 .build();
         return ResponseEntity.status(200).body(response);
+    }
+
+    @PostMapping("/like/{songId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<APIResponse> likeSong(@PathVariable String songId) {
+        PlaylistResponse playlistResponse = playlistService.addSongToPlaylist("default", songId);
+        songService.increaseLikeCount(songId);
+        return ResponseEntity.ok(APIResponse.builder()
+                .message("SUCCESS")
+                .data(playlistResponse)
+                .build());
+    }
+
+    @PostMapping("/unlike/{songId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<APIResponse> unlikeSong(@PathVariable String songId) {
+        PlaylistResponse playlistResponse = playlistService.removeSongFromPlaylist("default", songId);
+        songService.decreaseLikeCount(songId);
+        return ResponseEntity.ok(APIResponse.builder()
+                .message("SUCCESS")
+                .data(playlistResponse)
+                .build());
+    }
+
+    @PostMapping("/add-song-to-playlist")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<APIResponse> addSongToPlaylist(@RequestBody Map<String, String> data) {
+        String songId = data.get("songId");
+        String playlistId = data.get("playlistId");
+        PlaylistResponse playlistResponse = playlistService.addSongToPlaylist(playlistId, songId);
+        return ResponseEntity.ok(APIResponse.builder()
+                .message("SUCCESS")
+                .data(playlistResponse)
+                .build());
+    }
+
+    @PostMapping("/remove-song-from-playlist")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<APIResponse> removeSongFromPlaylist(@RequestBody Map<String, String> data) {
+        String songId = data.get("songId");
+        String playlistId = data.get("playlistId");
+        PlaylistResponse playlistResponse = playlistService.removeSongFromPlaylist(playlistId, songId);
+        return ResponseEntity.ok(APIResponse.builder()
+                .message("SUCCESS")
+                .data(playlistResponse)
+                .build());
     }
 }

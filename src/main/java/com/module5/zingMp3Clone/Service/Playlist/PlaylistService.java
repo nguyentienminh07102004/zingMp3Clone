@@ -1,10 +1,13 @@
 package com.module5.zingMp3Clone.Service.Playlist;
 
+import com.module5.zingMp3Clone.Exception.DataInvalidException;
 import com.module5.zingMp3Clone.Model.Entity.PlaylistEntity;
+import com.module5.zingMp3Clone.Model.Entity.SongEntity;
 import com.module5.zingMp3Clone.Model.Request.PlaylistRequest;
 import com.module5.zingMp3Clone.Model.Response.PlaylistDetailResponse;
 import com.module5.zingMp3Clone.Model.Response.PlaylistResponse;
 import com.module5.zingMp3Clone.Repository.IPlaylistRepository;
+import com.module5.zingMp3Clone.Repository.ISongRepository;
 import com.module5.zingMp3Clone.Util.GenerateSlug;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -15,6 +18,7 @@ import org.springframework.data.web.PagedModel;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -22,6 +26,7 @@ import java.util.List;
 public class PlaylistService {
     private final IPlaylistRepository playlistRepository;
     private final ModelMapper modelMapper;
+    private final ISongRepository songRepository;
 
     public List<PlaylistResponse> getAllPlaylistsOfCurrentUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -59,4 +64,48 @@ public class PlaylistService {
         return modelMapper.map(playlistRepository.save(playlistEntity), PlaylistResponse.class);
     }
 
+    public void createFavoritesPlaylist(String username) {
+        PlaylistEntity playlist = new PlaylistEntity();
+        playlist.setName(username + " Favorites");
+        playlist.setSlug(GenerateSlug.toSlug(playlist.getName()));
+        playlist.setCreatedBy(username);
+        playlist.setCreatedDate(LocalDate.now());
+        playlist.setViewCounts(0L);
+        playlist.setPlaylistDefault(true);
+        playlistRepository.save(playlist);
+    }
+
+    public PlaylistEntity getPlaylistById(String playlistId) {
+        if (playlistId.equals("default")) {
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            return playlistRepository.findByPlaylistDefaultAndCreatedBy(true, username);
+        }
+        return playlistRepository.findById(playlistId)
+                .orElseThrow(() -> new RuntimeException("Playlist not found!"));
+    }
+
+    public PlaylistResponse addSongToPlaylist(String playlistId, String songId) {
+        PlaylistEntity playlist = this.getPlaylistById(playlistId);
+        SongEntity song = songRepository.findById(songId)
+                .orElseThrow(() -> new RuntimeException("Song not found!"));
+        if (playlist.getSongs().contains(song)) {
+            throw new DataInvalidException("Song already exists in the playlist");
+        }
+        song.getPlaylists().add(playlist);
+        playlist.getSongs().add(song);
+        playlist = playlistRepository.save(playlist);
+        return modelMapper.map(playlist, PlaylistResponse.class);
+    }
+
+    public PlaylistResponse removeSongFromPlaylist(String playlistId, String songId) {
+        PlaylistEntity playlist = this.getPlaylistById(playlistId);
+        SongEntity songToRemove = playlist.getSongs().stream()
+                .filter(song -> song.getId().equals(songId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Song not found!"));
+        songToRemove.getPlaylists().remove(playlist);
+        playlist.getSongs().remove(songToRemove);
+        playlist = playlistRepository.save(playlist);
+        return modelMapper.map(playlist, PlaylistResponse.class);
+    }
 }
