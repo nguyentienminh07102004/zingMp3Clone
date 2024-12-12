@@ -1,5 +1,7 @@
 package com.module5.zingMp3Clone.Model.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -40,8 +42,10 @@ public class SongEntity extends BaseEntity {
     @JoinTable(name = "song_singer",
     joinColumns = @JoinColumn(name = "song_id"),
     inverseJoinColumns = @JoinColumn(name = "singer_id"))
+    @JsonManagedReference
     private List<SingerEntity> singers;
 
     @ManyToMany(mappedBy = "songs")
+    @JsonIgnore
     private List<PlaylistEntity> playlists;
 }

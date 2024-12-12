@@ -23,7 +23,7 @@ public class SingerController {
                 .data(singerResponses)
                 .build());
     }
-    @PostMapping("/search")
+    @GetMapping("/search")
     public ResponseEntity<APIResponse> search(@RequestParam("singerName") String name) {
         List<SingerResponse> singerResponses = singerService.getAllSingersByName(name);
         return ResponseEntity.ok(APIResponse.builder()

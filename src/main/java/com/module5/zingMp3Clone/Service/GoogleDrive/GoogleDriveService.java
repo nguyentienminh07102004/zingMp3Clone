@@ -10,7 +10,6 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.ServiceAccountCredentials;
-import com.module5.zingMp3Clone.Repository.ISongRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +29,6 @@ import java.util.Collections;
 public class GoogleDriveService {
     @Value("${DRIVE_FOLDER}")
     private String FOLDER_ID;
-    private final ISongRepository songRepository;
 
     public String uploadFile(MultipartFile multipartFile) throws GeneralSecurityException, IOException {
         String mimeType = multipartFile.getContentType();

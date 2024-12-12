@@ -47,7 +47,8 @@ public class PlaylistService {
     }
 
     public PlaylistDetailResponse getPlaylistDetail(String slug) {
-        PlaylistEntity playlistEntity = playlistRepository.findBySlug(slug).orElseThrow(() -> new RuntimeException("Playlist not found!"));
+        PlaylistEntity playlistEntity = playlistRepository.findBySlug(slug)
+                .orElseThrow(() -> new DataInvalidException("Playlist not found!"));
         return modelMapper.map(playlistEntity, PlaylistDetailResponse.class);
     }
 
