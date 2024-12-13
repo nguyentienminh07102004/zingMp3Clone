@@ -25,4 +25,5 @@ public class SongResponse {
     private boolean liked;
     private String description;
     private LocalDate createdDate;
+    private String createdBy;
 }

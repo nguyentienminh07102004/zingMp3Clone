@@ -9,6 +9,7 @@ import com.module5.zingMp3Clone.Model.Response.SingerResponse;
 import com.module5.zingMp3Clone.Model.Response.SongResponse;
 import com.module5.zingMp3Clone.Repository.ISingerRepository;
 import com.module5.zingMp3Clone.Repository.ISongRepository;
+import com.module5.zingMp3Clone.Repository.IUserRepository;
 import com.module5.zingMp3Clone.Service.Playlist.PlaylistService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -33,13 +34,15 @@ public class SongServiceImpl implements ISongService {
     ModelMapper modelMapper;
     ISingerRepository singerRepository;
     PlaylistService playlistService;
+    IUserRepository userRepository;
 
     @Override
     public List<SongResponse> getAllSongs() {
         List<SongEntity> list = songRepository.findAll();
         List<SongResponse> responseList = new ArrayList<>();
         for (SongEntity entity : list) {
-            SongResponse songResponse = toResponse(entity);
+            SongResponse songResponse = modelMapper.map(entity, SongResponse.class);
+            songResponse.setCreatedBy(userRepository.findByEmail(entity.getCreatedBy()).get().getUsername());
             responseList.add(songResponse);
         }
         return responseList;
