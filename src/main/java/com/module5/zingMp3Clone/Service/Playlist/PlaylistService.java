@@ -41,7 +41,7 @@ public class PlaylistService {
 
     public PagedModel<PlaylistResponse> getAllPlaylists(Integer page) {
         Pageable pageable = PageRequest.of(page, 8);
-        Page<PlaylistEntity> playlists = playlistRepository.findAllAndPlaylistDefaultFalse(pageable);
+        Page<PlaylistEntity> playlists = playlistRepository.findAllByPlaylistDefaultFalse(pageable);
         return new PagedModel<>(playlists.map(playlistEntity ->
                 modelMapper.map(playlistEntity, PlaylistResponse.class)));
     }

@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface IPlaylistRepository extends JpaRepository<PlaylistEntity, String> {
     List<PlaylistEntity> findByCreatedBy(String username);
     Optional<PlaylistEntity> findBySlug(String slug);
-    Page<PlaylistEntity> findAllAndPlaylistDefaultFalse(Pageable pageable);
+    Page<PlaylistEntity> findAllByPlaylistDefaultFalse(Pageable pageable);
     int countByName(String name);
     PlaylistEntity findByPlaylistDefaultAndCreatedBy(boolean playlistDefault, String username);
 }
