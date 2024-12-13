@@ -39,17 +39,9 @@ public class SongServiceImpl implements ISongService {
     @Override
     public List<SongResponse> getAllSongs() {
         List<SongEntity> list = songRepository.findAll();
-        List<SongResponse> responseList = new ArrayList<>();
-        for (SongEntity entity : list) {
-            SongResponse songResponse = modelMapper.map(entity, SongResponse.class);
-            songResponse.setCreatedBy(userRepository.findByEmail(entity.getCreatedBy()).get().getUsername());
-            List<SingerResponse> singerResponses = entity.getSingers().stream()
-                    .map(singer -> modelMapper.map(singer, SingerResponse.class))
-                    .toList();
-            songResponse.setSingers(singerResponses);
-            responseList.add(songResponse);
-        }
-        return responseList;
+        return list.stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     @Override
