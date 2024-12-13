@@ -41,12 +41,13 @@ public class PlaylistService {
 
     public PagedModel<PlaylistResponse> getAllPlaylists(Integer page) {
         Pageable pageable = PageRequest.of(page, 8);
-        Page<PlaylistEntity> playlists = playlistRepository.findAll(pageable);
+        Page<PlaylistEntity> playlists = playlistRepository.findAllAndPlaylistDefaultFalse(pageable);
         return new PagedModel<>(playlists.map(playlistEntity ->
                 modelMapper.map(playlistEntity, PlaylistResponse.class)));
     }
 
     public PlaylistDetailResponse getPlaylistDetail(String slug) {
+        if(slug == null || slug.isBlank()) slug = "default";
         PlaylistEntity playlistEntity = playlistRepository.findBySlug(slug)
                 .orElseThrow(() -> new DataInvalidException("Playlist not found!"));
         return modelMapper.map(playlistEntity, PlaylistDetailResponse.class);
