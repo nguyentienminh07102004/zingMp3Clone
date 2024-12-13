@@ -43,6 +43,10 @@ public class SongServiceImpl implements ISongService {
         for (SongEntity entity : list) {
             SongResponse songResponse = modelMapper.map(entity, SongResponse.class);
             songResponse.setCreatedBy(userRepository.findByEmail(entity.getCreatedBy()).get().getUsername());
+            List<SingerResponse> singerResponses = entity.getSingers().stream()
+                    .map(singer -> modelMapper.map(singer, SingerResponse.class))
+                    .toList();
+            songResponse.setSingers(singerResponses);
             responseList.add(songResponse);
         }
         return responseList;
@@ -113,7 +117,8 @@ public class SongServiceImpl implements ISongService {
                 .map(singer -> modelMapper.map(singer, SingerResponse.class))
                 .toList();
         songResponse.setSingers(singerResponses);
-        if (!SecurityContextHolder.getContext().getAuthentication().getName().equals("anonymousUser")) {
+        if (!SecurityContextHolder.getContext().getAuthentication().getName().equalsIgnoreCase("anonymousUser")) {
+            songResponse.setCreatedBy(userRepository.findByEmail(entity.getCreatedBy()).get().getUsername());
             PlaylistEntity playlist = playlistService.getPlaylistById("default");
             if(playlist.getSongs() != null && !playlist.getSongs().isEmpty()) {
                 songResponse.setLiked(playlist.getSongs().contains(entity));
