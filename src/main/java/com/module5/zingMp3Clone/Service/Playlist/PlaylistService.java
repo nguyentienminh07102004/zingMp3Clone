@@ -8,6 +8,7 @@ import com.module5.zingMp3Clone.Model.Response.PlaylistDetailResponse;
 import com.module5.zingMp3Clone.Model.Response.PlaylistResponse;
 import com.module5.zingMp3Clone.Repository.IPlaylistRepository;
 import com.module5.zingMp3Clone.Repository.ISongRepository;
+import com.module5.zingMp3Clone.Repository.IUserRepository;
 import com.module5.zingMp3Clone.Util.GenerateSlug;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -27,30 +28,43 @@ public class PlaylistService {
     private final IPlaylistRepository playlistRepository;
     private final ModelMapper modelMapper;
     private final ISongRepository songRepository;
+    private final IUserRepository userRepository;
 
     public List<PlaylistResponse> getAllPlaylistsOfCurrentUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        String createdBy = userRepository.findByEmail(username).get().getUsername();
         List<PlaylistEntity> playlistEntities = playlistRepository.findByCreatedBy(username);
         if (playlistEntities.isEmpty()) {
             return null;
         }
         return playlistEntities.stream()
-                .map(playlistEntity -> modelMapper.map(playlistEntity, PlaylistResponse.class))
+                .map(playlistEntity -> {
+                    PlaylistResponse response = modelMapper.map(playlistEntity, PlaylistResponse.class);
+                    response.setCreatedBy(createdBy);
+                    return response;
+                })
                 .toList();
     }
 
     public PagedModel<PlaylistResponse> getAllPlaylists(Integer page) {
         Pageable pageable = PageRequest.of(page, 8);
         Page<PlaylistEntity> playlists = playlistRepository.findAllByPlaylistDefaultFalse(pageable);
-        return new PagedModel<>(playlists.map(playlistEntity ->
-                modelMapper.map(playlistEntity, PlaylistResponse.class)));
+        return new PagedModel<>(playlists.map(playlistEntity -> {
+            PlaylistResponse playlistResponse = modelMapper.map(playlistEntity, PlaylistResponse.class);
+            String createdBy = userRepository.findByEmail(playlistResponse.getCreatedBy()).get().getUsername();
+            playlistResponse.setCreatedBy(createdBy);
+            return playlistResponse;
+        }));
     }
 
     public PlaylistDetailResponse getPlaylistDetail(String slug) {
         if(slug == null || slug.isBlank()) slug = "default";
         PlaylistEntity playlistEntity = playlistRepository.findBySlug(slug)
                 .orElseThrow(() -> new DataInvalidException("Playlist not found!"));
-        return modelMapper.map(playlistEntity, PlaylistDetailResponse.class);
+        PlaylistDetailResponse response = modelMapper.map(playlistEntity, PlaylistDetailResponse.class);
+        String createdBy = userRepository.findByEmail(playlistEntity.getCreatedBy()).get().getUsername();
+        response.setCreatedBy(createdBy);
+        return response;
     }
 
     public PlaylistResponse savePlaylist(PlaylistRequest playlistRequest) {

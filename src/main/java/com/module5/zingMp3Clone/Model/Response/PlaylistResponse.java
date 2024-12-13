@@ -16,4 +16,5 @@ public class PlaylistResponse {
     private String name;
     private String avatar;
     private String slug;
+    private String createdBy;
 }
